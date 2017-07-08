@@ -1,8 +1,13 @@
 <?php
 
+define('_SYS', 1);
+define('__ROOT__', dirname(__FILE__));
+
 header('Content-Type: text/html; charset=utf-8');
 
-include 'config.php'
+if (!file_exists(__ROOT__.'/config.php')) {
+    require_once(__ROOT__.'/config.php');
+}
 
 ?>
 <!DOCTYPE html>
@@ -31,6 +36,7 @@ include 'header.php'
                 <li><a href="https://vk.com/mikrotik_os" target="_blank">Группа VK</a></li>
                 <li><a href="#">О нас</a></li>
                 <li><a href="#partners">Партнёры</a></li>
+                <li><a href="#partners"><i class="fa fa-bars"></i></a></li>
             </ul>
         </div>
         <!-- /.navbar-collapse -->
