@@ -1,0 +1,9 @@
+Listen 80
+Listen 81
+<VirtualHost *:81>
+DocumentRoot "/usr/local/www/apache24/data/stop"
+</VirtualHost>
+
+
+chown -R root /usr/local/www/apache24/data/stop
+
