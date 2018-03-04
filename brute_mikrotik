@@ -1,0 +1,28 @@
+/ip firewall filter
+add action=drop chain=input comment="drop ssh brute forcers" disabled=no dst-port=22 protocol=tcp src-address-list=ssh_blacklist
+add action=add-src-to-address-list address-list=ssh_blacklist address-list-timeout=1w3d chain=input connection-state=new disabled=no dst-port=22 protocol=tcp src-address-list=ssh_stage3
+add action=add-src-to-address-list address-list=ssh_stage3 address-list-timeout=1m chain=input connection-state=new disabled=no dst-port=22 protocol=tcp src-address-list=ssh_stage2
+add action=add-src-to-address-list address-list=ssh_stage2 address-list-timeout=1m chain=input connection-state=new disabled=no dst-port=22 protocol=tcp src-address-list=ssh_stage1
+add action=add-src-to-address-list address-list=ssh_stage1 address-list-timeout=1m chain=input connection-state=new disabled=no dst-port=22 protocol=tcp
+add action=drop chain=input comment="drop telnet brute forcers" disabled=no dst-port=23 protocol=tcp src-address-list=telnet_blacklist
+add action=add-src-to-address-list address-list=telnet_blacklist address-list-timeout=1w3d chain=input connection-state=new disabled=no dst-port=23 protocol=tcp src-address-list=telnet_stage3
+add action=add-src-to-address-list address-list=telnet_stage3 address-list-timeout=1m chain=input connection-state=new disabled=no dst-port=23 protocol=tcp src-address-list=telnet_stage2
+add action=add-src-to-address-list address-list=telnet_stage2 address-list-timeout=1m chain=input connection-state=new disabled=no dst-port=23 protocol=tcp src-address-list=telnet_stage1
+add action=add-src-to-address-list address-list=telnet_stage1 address-list-timeout=1m chain=input connection-state=new disabled=no dst-port=23 protocol=tcp
+add chain=input protocol=tcp dst-port=21 src-address-list=ftp_blacklist action=drop \
+comment="drop ftp brute forcers"
+add chain=output action=accept protocol=tcp content="530 Login incorrect" dst-limit=1/1m,9,dst-address/1m
+add chain=output action=add-dst-to-address-list protocol=tcp content="530 Login incorrect" \
+address-list=ftp_blacklist address-list-timeout=3h
+add chain=input protocol=tcp dst-port=22 src-address-list=ssh_blacklist action=drop \
+comment="drop ssh brute forcers" disabled=no
+add chain=input protocol=tcp dst-port=22 connection-state=new \
+src-address-list=ssh_stage3 action=add-src-to-address-list address-list=ssh_blacklist \
+address-list-timeout=10d comment="" disabled=no
+add chain=input protocol=tcp dst-port=22 connection-state=new \
+src-address-list=ssh_stage2 action=add-src-to-address-list address-list=ssh_stage3 \
+address-list-timeout=1m comment="" disabled=no
+add chain=input protocol=tcp dst-port=22 connection-state=new src-address-list=ssh_stage1 \
+action=add-src-to-address-list address-list=ssh_stage2 address-list-timeout=1m comment="" disabled=no
+add chain=input protocol=tcp dst-port=22 connection-state=new action=add-src-to-address-list \
+address-list=ssh_stage1 address-list-timeout=1m comment="" disabled=no
